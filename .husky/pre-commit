@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# 스크립트 실행 위치 설정
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+root_dir=$(dirname "$script_dir")
+
+# package.json 파일 경로 설정
+package_json_path="$root_dir/package.json"
+echo "package.json path: $package_json_path"
+
+# index.html 파일 경로 설정
+index_html_path="$root_dir/docs/index.html"
+echo "index.html path: $index_html_path"
+
+# package.json 파일에서 버전 가져오기
+version=$(grep -o '"version": *"[^"]*"' "$package_json_path" | cut -d '"' -f 4)
+echo "version: $version"
+
+# npm 버전 업데이트
+npm version patch --no-git-tag-version
+
+# 새 버전 가져오기
+new_version=$(grep -o '"version": *"[^"]*"' "$package_json_path" | cut -d '"' -f 4)
+echo "new version: $new_version"
+
+# index.html 파일에서 버전 업데이트
+sed -i '' "s/$version/$new_version/g" "$index_html_path"
+echo "sed -i '' 's/$version/$new_version/g' $index_html_path"
+
+
+# 업데이트 된 파일들 git add
+git add .
