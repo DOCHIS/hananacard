@@ -462,21 +462,22 @@ const set_bgm_volume = document.getElementById('set_bgm_volume'); // input range
 const set_effect_volume = document.getElementById('set_effect_volume'); // input range
 const set_audio_volume = document.getElementById('set_audio_volume'); // input range
 
-set_effect_volume.addEventListener('change', () => {
-  for(let i = 0; i < effectConfig.length; i++) {
-    const key = effectConfig[i];
-    effects[key].volume = set_effect_volume.value / 100;
-  }
-  Toastify({
-    text: `효과음 볼륨 ${set_effect_volume.value}%`,
-    className: "info",
-  }).showToast();
-});
-
 set_bgm_volume.addEventListener('change', () => {
   effects['bgm'].volume = set_bgm_volume.value / 100;
   Toastify({
     text: `BGM 볼륨 ${set_bgm_volume.value}%`,
+    className: "info",
+  }).showToast();
+});
+
+set_effect_volume.addEventListener('change', () => {
+  for(let i = 0; i < effectConfig.length; i++) {
+    const key = effectConfig[i];
+    if(key === 'bgm') continue;
+    effects[key].volume = set_effect_volume.value / 100;
+  }
+  Toastify({
+    text: `효과음 볼륨 ${set_effect_volume.value}%`,
     className: "info",
   }).showToast();
 });
