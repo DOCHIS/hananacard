@@ -53,7 +53,8 @@ const effectConfig = [
   "horr",
   "fail",
   "game_start",
-  "mission"
+  "mission",
+  "success"
 ]
 let openCards = [];
 let matchedCards = [];
@@ -223,9 +224,9 @@ function checkSuccess() {
     }, 1000);
     stopClock();
 
-    // 냐하하
+    // 게임 종료
     setTimeout(function () {
-      audio["냐하하"].play();
+      effects["success"].play();
     }, 500);
   }
 }
