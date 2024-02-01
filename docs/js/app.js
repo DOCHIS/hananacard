@@ -458,93 +458,81 @@ modal_replay.addEventListener("click", () => {
 /**
  * Volume Control
  */
+const volumeKeys = ["bgm", "effect", "audio"];
+const volumes = ["set_bgm_volume", "set_effect_volume", "set_audio_volume"];
 const set_bgm_volume = document.getElementById("set_bgm_volume");
 const set_effect_volume = document.getElementById("set_effect_volume");
 const set_audio_volume = document.getElementById("set_audio_volume");
 
 const set_bgm_mute_toggle = document.getElementById("set_bgm_mute_toggle");
-const set_effect_mute_toggle = document.getElementById(
-  "set_effect_mute_toggle"
-);
+const set_effect_mute_toggle = document.getElementById("set_effect_mute_toggle");
 const set_audio_mute_toggle = document.getElementById("set_audio_mute_toggle");
 
-// 음소거 토글 및 볼륨 조절을 위한 공통 함수
-const changeVolume = (config, volumeSlider, toggleButton, typeText) => {
-  let volume = volumeSlider.value / 100;
-  config.forEach((key) => {
-    if (typeText === "effects" && key === "bgm") effects[key].volume = volume;
-    (typeText === "effects" ? effects[key] : audio[key]).volume = volume;
-  });
-
-  if (volume === 0) {
-    toggleButton.classList.replace("fa-volume-up", "fa-volume-off");
-  } else if (volume > 0) {
-    toggleButton.classList.replace("fa-volume-off", "fa-volume-up");
-  }
-
-  Toastify({
-    text: `${typeText === "effects" ? "효과음" : typeText} 볼륨 ${
-      volumeSlider.value
-    }%`,
-    className: "info",
-  }).showToast();
-};
-
 // 음소거 토글을 위한 공통 함수
-const toggleMute = (config, toggleButton, volumeSlider, typeText) => {
-  if (
-    (typeText === "effects" ? effects[config[0]] : audio[config[0]]).volume > 0
-  ) {
-    config.forEach((key) => {
-      (typeText === "effects" ? effects[key] : audio[key]).volume = 0;
-    });
-    toggleButton.classList.replace("fa-volume-up", "fa-volume-off");
-    volumeSlider.value = 0; // 음소거 시 볼륨 슬라이더 값을 0으로 설정
-  } else {
-    const volume = 0.5; // 볼륨을 50%로 설정
-    config.forEach((key) => {
-      (typeText === "effects" ? effects[key] : audio[key]).volume = volume;
-    });
-    toggleButton.classList.replace("fa-volume-off", "fa-volume-up");
-    volumeSlider.value = Math.round(volume * 100); // 볼륨 슬라이더 값을 50으로 설정
-  }
+const toggleMute = (el, i) => {
+  const hasMute = el.classList.contains("fa-volume-off");
+  const volumeSlider = document.getElementById(volumes[i]);
+  volumeSlider.value = hasMute ? 30 : 0;
+  updateVolume();
 };
 
-set_bgm_volume.addEventListener("change", () =>
-  changeVolume(["bgm"], set_bgm_volume, set_bgm_mute_toggle, "effects")
+// 볼륨 설정을 로컬 스토리지에 저장
+const saveVolume = () => {
+  const volumeConfig = {
+    bgm: parseInt(set_bgm_volume.value),
+    effect: parseInt(set_effect_volume.value),
+    audio: parseInt(set_audio_volume.value),
+  }
+  localStorage.setItem("hananacard_volume_config", JSON.stringify(volumeConfig));
+};
+
+// input 값에 따라 볼륨 조절
+const updateVolume = () => {
+  saveVolume();
+  volumes.forEach((id) => {
+
+    // update volume
+    const volumeSlider = document.getElementById(id);
+    const volume = volumeSlider.value / 100;
+    if (id === "set_bgm_volume") {
+      effects["bgm"].volume = volume;
+    } else if (id === "set_effect_volume") {
+      effectConfig
+        .filter((key) => key !== "bgm")
+        .forEach((key) => (effects[key].volume = volume));
+    } else if (id === "set_audio_volume") {
+      audioConfig.forEach((key) => (audio[key].volume = volume));
+    }
+
+    // update volume icon
+    const idr = id.replace("_volume", "");
+    const muteToggle = document.getElementById(`${idr}_mute_toggle`);
+    if (volumeSlider.value == 0) {
+      muteToggle.classList.replace("fa-volume-up", "fa-volume-off");
+    } else {
+      muteToggle.classList.replace("fa-volume-off", "fa-volume-up");
+    }
+  });
+};
+
+[set_bgm_volume, set_effect_volume, set_audio_volume].forEach((el) =>
+  el.addEventListener("change", () => updateVolume())
 );
 
-set_effect_volume.addEventListener("change", () =>
-  changeVolume(
-    effectConfig.filter((key) => key !== "bgm"),
-    set_effect_volume,
-    set_effect_mute_toggle,
-    "effects"
-  )
+[set_bgm_mute_toggle, set_effect_mute_toggle, set_audio_mute_toggle].forEach((el, i) =>
+  el.addEventListener("click", () => toggleMute(el, i))
 );
 
-set_audio_volume.addEventListener("change", () =>
-  changeVolume(audioConfig, set_audio_volume, set_audio_mute_toggle, "audio")
-);
-
-set_bgm_mute_toggle.addEventListener("click", () =>
-  toggleMute(["bgm"], set_bgm_mute_toggle, set_bgm_volume, "effects")
-);
-
-set_effect_mute_toggle.addEventListener("click", () =>
-  toggleMute(
-    effectConfig.filter((key) => key !== "bgm"),
-    set_effect_mute_toggle,
-    set_effect_volume,
-    "effects"
-  )
-);
-
-set_audio_mute_toggle.addEventListener("click", () =>
-  toggleMute(audioConfig, set_audio_mute_toggle, set_audio_volume, "audio")
-);
-
-// 기본 볼륨 설정
-["set_bgm_volume", "set_effect_volume", "set_audio_volume"].forEach(
-  (id) => (document.getElementById(id).value = 50)
-);
+// 로컬 스토리지에 저장된 볼륨 설정을 불러옴
+const volumeConfig = JSON.parse(localStorage.getItem("hananacard_volume_config"));
+if (volumeConfig) {
+  console.log("volumeConfig", volumeConfig);
+  set_bgm_volume.value = volumeConfig.bgm;
+  set_effect_volume.value = volumeConfig.effect;
+  set_audio_volume.value = volumeConfig.audio;
+} else {
+  set_bgm_volume.value = 30;
+  set_effect_volume.value = 30;
+  set_audio_volume.value = 30;
+}
+updateVolume();
