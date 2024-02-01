@@ -215,9 +215,11 @@ function checkSuccess() {
     setInterval(function () {
       let x = (Math.random() * canvas.width) / window.devicePixelRatio;
       let color = colors[Math.floor(Math.random() * colors.length)];
-      fireworks.push(
-        new Firework(x, canvas.height / window.devicePixelRatio, color)
-      );
+      if(fireworks.length < 50){
+        fireworks.push(
+          new Firework(x, canvas.height / window.devicePixelRatio, color)
+        );
+      }
     }, 1000);
     stopClock();
 
