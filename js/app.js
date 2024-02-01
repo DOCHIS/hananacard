@@ -348,7 +348,6 @@ function checkIfCardsMatch() {
       });
 
       openCards.length = 0;
-      score = 0;
       combo = 0;
       failCombo++;
       displayFailCombo();
