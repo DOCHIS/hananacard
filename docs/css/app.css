@@ -305,6 +305,9 @@ header {
 .volume-controlls .controll .slider input {
   width: 100%;
 }
+.volume-controlls .controll i {
+  cursor: pointer;
+}
 
 
 .copyright {

@@ -54,8 +54,8 @@ const effectConfig = [
   "fail",
   "game_start",
   "mission",
-  "success"
-]
+  "success",
+];
 let openCards = [];
 let matchedCards = [];
 let moves = 0;
@@ -128,8 +128,8 @@ function setCards() {
   }
 
   const deck = document.querySelector(".deck");
-  for(let i = 0; i < deck.classList.length; i++) {
-    if(deck.classList[i].includes("x")) {
+  for (let i = 0; i < deck.classList.length; i++) {
+    if (deck.classList[i].includes("x")) {
       deck.classList.remove(deck.classList[i]);
     }
   }
@@ -202,7 +202,7 @@ function addMoves() {
  */
 function updateScore() {
   const scoreText = document.querySelector(".score");
-  score = (100 + (success * 100)) - (fail * 10);
+  score = 100 + success * 100 - fail * 10;
   scoreText.innerHTML = score;
 }
 
@@ -216,7 +216,7 @@ function checkSuccess() {
     setInterval(function () {
       let x = (Math.random() * canvas.width) / window.devicePixelRatio;
       let color = colors[Math.floor(Math.random() * colors.length)];
-      if(fireworks.length < 50){
+      if (fireworks.length < 50) {
         fireworks.push(
           new Firework(x, canvas.height / window.devicePixelRatio, color)
         );
@@ -299,7 +299,7 @@ function displayCombo() {
       className: "info",
     }).showToast();
 
-    switch(combo) {
+    switch (combo) {
       case 1:
         audio["냐1"].play();
         break;
@@ -317,7 +317,7 @@ function displayCombo() {
  * displayFailCombo
  */
 function displayFailCombo() {
-  if(failCombo >= 4) {
+  if (failCombo >= 4) {
     audio["멍멍멍"].play();
     Toastify({
       text: `${failCombo} 연속 못맞춤! 멍멍멍!`,
@@ -458,42 +458,93 @@ modal_replay.addEventListener("click", () => {
 /**
  * Volume Control
  */
-const set_bgm_volume = document.getElementById('set_bgm_volume'); // input range
-const set_effect_volume = document.getElementById('set_effect_volume'); // input range
-const set_audio_volume = document.getElementById('set_audio_volume'); // input range
+const set_bgm_volume = document.getElementById("set_bgm_volume");
+const set_effect_volume = document.getElementById("set_effect_volume");
+const set_audio_volume = document.getElementById("set_audio_volume");
 
-set_bgm_volume.addEventListener('change', () => {
-  effects['bgm'].volume = set_bgm_volume.value / 100;
-  Toastify({
-    text: `BGM 볼륨 ${set_bgm_volume.value}%`,
-    className: "info",
-  }).showToast();
-});
+const set_bgm_mute_toggle = document.getElementById("set_bgm_mute_toggle");
+const set_effect_mute_toggle = document.getElementById(
+  "set_effect_mute_toggle"
+);
+const set_audio_mute_toggle = document.getElementById("set_audio_mute_toggle");
 
-set_effect_volume.addEventListener('change', () => {
-  for(let i = 0; i < effectConfig.length; i++) {
-    const key = effectConfig[i];
-    if(key === 'bgm') continue;
-    effects[key].volume = set_effect_volume.value / 100;
+// 음소거 토글 및 볼륨 조절을 위한 공통 함수
+const changeVolume = (config, volumeSlider, toggleButton, typeText) => {
+  let volume = volumeSlider.value / 100;
+  config.forEach((key) => {
+    if (typeText === "effects" && key === "bgm") effects[key].volume = volume;
+    (typeText === "effects" ? effects[key] : audio[key]).volume = volume;
+  });
+
+  if (volume === 0) {
+    toggleButton.classList.replace("fa-volume-up", "fa-volume-off");
+  } else if (volume > 0) {
+    toggleButton.classList.replace("fa-volume-off", "fa-volume-up");
   }
+
   Toastify({
-    text: `효과음 볼륨 ${set_effect_volume.value}%`,
+    text: `${typeText === "effects" ? "효과음" : typeText} 볼륨 ${
+      volumeSlider.value
+    }%`,
     className: "info",
   }).showToast();
-});
+};
 
-set_audio_volume.addEventListener('change', () => {
-  for(let i = 0; i < audioConfig.length; i++) {
-    const key = audioConfig[i];
-    audio[key].volume = set_audio_volume.value / 100;
+// 음소거 토글을 위한 공통 함수
+const toggleMute = (config, toggleButton, volumeSlider, typeText) => {
+  if (
+    (typeText === "effects" ? effects[config[0]] : audio[config[0]]).volume > 0
+  ) {
+    config.forEach((key) => {
+      (typeText === "effects" ? effects[key] : audio[key]).volume = 0;
+    });
+    toggleButton.classList.replace("fa-volume-up", "fa-volume-off");
+    volumeSlider.value = 0; // 음소거 시 볼륨 슬라이더 값을 0으로 설정
+  } else {
+    const volume = 0.5; // 볼륨을 50%로 설정
+    config.forEach((key) => {
+      (typeText === "effects" ? effects[key] : audio[key]).volume = volume;
+    });
+    toggleButton.classList.replace("fa-volume-off", "fa-volume-up");
+    volumeSlider.value = Math.round(volume * 100); // 볼륨 슬라이더 값을 50으로 설정
   }
-  Toastify({
-    text: `보이스 볼륨 ${set_audio_volume.value}%`,
-    className: "info",
-  }).showToast();
-});
+};
 
-// default volume
-set_bgm_volume.value = 50;
-set_effect_volume.value = 50;
-set_audio_volume.value = 50;
+set_bgm_volume.addEventListener("change", () =>
+  changeVolume(["bgm"], set_bgm_volume, set_bgm_mute_toggle, "effects")
+);
+
+set_effect_volume.addEventListener("change", () =>
+  changeVolume(
+    effectConfig.filter((key) => key !== "bgm"),
+    set_effect_volume,
+    set_effect_mute_toggle,
+    "effects"
+  )
+);
+
+set_audio_volume.addEventListener("change", () =>
+  changeVolume(audioConfig, set_audio_volume, set_audio_mute_toggle, "audio")
+);
+
+set_bgm_mute_toggle.addEventListener("click", () =>
+  toggleMute(["bgm"], set_bgm_mute_toggle, set_bgm_volume, "effects")
+);
+
+set_effect_mute_toggle.addEventListener("click", () =>
+  toggleMute(
+    effectConfig.filter((key) => key !== "bgm"),
+    set_effect_mute_toggle,
+    set_effect_volume,
+    "effects"
+  )
+);
+
+set_audio_mute_toggle.addEventListener("click", () =>
+  toggleMute(audioConfig, set_audio_mute_toggle, set_audio_volume, "audio")
+);
+
+// 기본 볼륨 설정
+["set_bgm_volume", "set_effect_volume", "set_audio_volume"].forEach(
+  (id) => (document.getElementById(id).value = 50)
+);
