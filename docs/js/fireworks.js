@@ -132,7 +132,7 @@ function animate() {
     ctx.shadowBlur = 10; // 그림자 흐림 정도를 높임
     ctx.shadowOffsetX = 2; // 그림자의 X축 오프셋을 줄임
     ctx.shadowOffsetY = 2; // 그림자의 Y축 오프셋을 줄임
-    ctx.fillText(`냐짝을 다 맞췃다!`, canvas.width/2/window.devicePixelRatio, canvas.height/2/window.devicePixelRatio - 100);
+    ctx.fillText(`ㄴㅑ짝을 다 맞췃다!`, canvas.width/2/window.devicePixelRatio, canvas.height/2/window.devicePixelRatio - 100);
     ctx.fillText(`${score}점 달성!`, canvas.width/2/window.devicePixelRatio, canvas.height/2/window.devicePixelRatio - 30);
     ctx.fillText(`크기 ${settings.size} / ${settings.time} 초`, canvas.width/2/window.devicePixelRatio, canvas.height/2/window.devicePixelRatio + 40);
 
