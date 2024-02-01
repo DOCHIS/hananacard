@@ -1,0 +1,329 @@
+html {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+  user-select: inherit;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #ffffff url("../img/geometry2.png"); /* Background pattern from Subtle Patterns */
+  font-family: "Pretendard", cursive;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+h1 {
+  font-family: "Pretendard", sans-serif;
+  font-weight: 900;
+  color:#cf6c70;
+  margin: 0;
+  word-break: keep-all;
+}
+
+/** disable drag **/
+
+
+/*
+* Styles for the deck of cards
+*/
+
+/** 폭죽 효과 **/
+canvas {
+  position: fixed;
+  margin: 0;
+  padding: 0;
+  display: block;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background: rgba(0,0,0,0.1);
+  cursor:pointer;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 490px;
+  margin-top:15px;
+}
+.deck {
+  display: grid;
+  grid-auto-flow: dense;
+  grid-gap: 10px;
+  padding: 30px 30px;
+  box-shadow: 12px 15px 20px 0 rgba(46, 61, 73, 0.5);
+  background: linear-gradient(to bottom right, rgb(255 208 210) 0%, rgb(255 170 174) 35%, rgb(255 160 164) 45%, rgb(255 163 160) 48%, rgb(255,170,161) 60%, rgb(255,212,200) 100%);
+}
+.deck.x2 {
+  grid-template-columns: repeat(2, 208px);
+  grid-template-rows: repeat(2, 208px);
+}
+.deck.x4 {
+  grid-template-columns: repeat(4, 104px);
+  grid-template-rows: repeat(4, 104px);
+}
+.deck.x6 {
+  grid-template-columns: repeat(6, 70px);
+  grid-template-rows: repeat(6, 70px);
+}
+.deck.x8 {
+  grid-template-columns: repeat(8, 52px);
+  grid-template-rows: repeat(8, 52px);
+}
+
+
+.deck .card {
+  background: #2e3d49;
+  color: #ffffff;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.deck .card.open {
+  transform: rotateY(0);
+  background: #02b3e4;
+  cursor: default;
+}
+
+.deck .card .card-img {
+  transform: rotateY(90deg);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.deck .card.show .card-img {
+  transform: rotateY(0deg);
+}
+
+.deck .card.match {
+  cursor: default;
+  background: #02ccba;
+}
+
+.deck .card.match .card-img {
+  transform: rotateY(0deg);
+}
+
+
+/*
+* Styles for the Score Panel
+*/
+
+.score-panel {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+.score-panel div {
+  text-align: left;
+}
+.score-panel div strong {
+  display: block;
+}
+.score-panel div span {
+}
+
+.score-panel .stars {
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  margin: 0 5px 0 0;
+}
+
+.score-panel .stars li {
+  list-style: none;
+  display: inline-block;
+}
+
+.score-panel .restart {
+  float: right;
+  cursor: pointer;
+}
+.score-panel .restart:hover {
+  color: #02ccba;
+}
+.score-panel .restart i {
+  animation: rotate 1s linear infinite;
+  margin-right: 5px;
+}
+
+
+/* modal styles */
+
+.modal_background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.438);
+}
+
+.modal_body {
+  position: relative;
+  width: 400px;
+  top: 50%;
+  left: 50%;
+  background: #ffffff;
+  transform: translate(-50%, -70%);
+}
+.modal_options {
+  width: 100%;
+}
+.modal_options .input_group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid gray;
+}
+.modal_options .input_group label {
+  font-size: 1.2rem;
+}
+.modal_options .input_group input, .modal_options .input_group select {
+  width: 130px;
+  height: 30px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.modal_heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid gray;
+}
+
+.modal_close {
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+.modal_stats {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-left: 1rem;
+  border-bottom: 1px solid gray;
+}
+
+.modal_buttons {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+}
+
+.modal_button {
+  width: 120px;
+  border-radius: 5px;
+  border: 1px solid #ffffff;
+  background: #cf6c70;
+  color: #fff;
+  padding: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.hide {
+  display: none;
+}
+
+
+/** 시간 초과 모달 */
+.time_over {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 999;
+}
+.time_over .time_over_text {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #cf6c70;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.volume-controlls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+.volume-controlls .controll {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.volume-controlls .controll .title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.volume-controlls .controll .slider {
+  width: 100%;
+}
+.volume-controlls .controll .slider input {
+  width: 100%;
+}
+
+
+.copyright {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  margin: 0;
+  background: #4d4d4d;
+  color: #fff;
+  border-radius: 15px 12px 0 0;
+  padding: 8px 20px;
+}
+.copyright a {
+  color: #fff;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
