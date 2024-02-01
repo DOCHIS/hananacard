@@ -81,7 +81,7 @@ startGame();
 let audio = [];
 for (let i = 0; i < audioConfig.length; i++) {
   const key = audioConfig[i];
-  audio[key] = new Audio(`audio/${audioConfig[i]}.wav`);
+  audio[key] = new Audio(`audio/${audioConfig[i]}.wav?v2`);
 }
 
 // 이미지 프리로드
