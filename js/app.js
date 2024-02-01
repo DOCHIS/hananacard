@@ -59,12 +59,15 @@ let openCards = [];
 let matchedCards = [];
 let moves = 0;
 let clockOff = true;
+let score = 0;
 let time = 30;
 let clockId;
-let score = 0;
-let combo = 0;
-let failCombo = 0;
+let success = 0; // success count
+let combo = 0; // success combo count
+let failCombo = 0; // fail combo count
+let fail = 0; // fail total count
 let size = { x: 4, y: 4, count: 16 };
+let settings = { time: 30, size: "4x4" };
 
 // 랜덤 카드 8개 뽑기
 let randomCards = cardsConfig.sort(() => Math.random() - Math.random());
@@ -194,10 +197,19 @@ function addMoves() {
 }
 
 /**
- * Calculate Score (Score is Matched Card Count)
+ * Update Score
  */
-function checkScore() {
-  if (score === size.count / 2) {
+function updateScore() {
+  const scoreText = document.querySelector(".score");
+  score = (100 + (success * 100)) - (fail * 10);
+  scoreText.innerHTML = score;
+}
+
+/**
+ * Calculate Success (Success is Matched Card Count)
+ */
+function checkSuccess() {
+  if (success === size.count / 2) {
     fireworksEl.style.display = "block";
     animate();
     setInterval(function () {
@@ -258,7 +270,7 @@ deck.addEventListener("click", (event) => {
 
     if (openCards.length === 2) {
       checkIfCardsMatch();
-      checkScore();
+      checkSuccess();
     }
     effects["mission"].play();
   }
@@ -337,7 +349,7 @@ function checkIfCardsMatch() {
     matchedCards.push(openCards[0]);
     matchedCards.push(openCards[1]);
     openCards = [];
-    score++;
+    success++;
     combo++;
     failCombo = 0;
     displayCombo();
@@ -349,6 +361,7 @@ function checkIfCardsMatch() {
 
       openCards.length = 0;
       combo = 0;
+      fail++;
       failCombo++;
       displayFailCombo();
     }, 600);
@@ -376,10 +389,10 @@ function displayTime() {
  * @returns {void}
  */
 function startClock() {
-  // prints seconds in dev console
   clockId = setInterval(() => {
     time--;
     displayTime();
+    updateScore();
     if (time == 0) {
       stopClock();
       endGame();
@@ -419,6 +432,10 @@ modal_replay.addEventListener("click", () => {
   const set_time = document.querySelector("#set_time");
   time = set_time.value;
 
+  // 설정에 저장
+  settings.size = set_size.value;
+  settings.time = set_time.value;
+
   // Effect 재생
   effects["game_start"].play();
 
@@ -431,7 +448,7 @@ modal_replay.addEventListener("click", () => {
   setCards();
   startGame();
   displayTime();
-  checkScore();
+  checkSuccess();
   toggleModal();
 });
 
