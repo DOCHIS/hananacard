@@ -426,18 +426,8 @@ function toggleModal() {
  * @returns {void}
  */
 modal_replay.addEventListener("click", () => {
-  const set_size = document.querySelector("#set_size"); // 2x2, 4x4, 6x6, 8x8
-  const sizt_params = set_size.value.split("x");
-  size.x = parseInt(sizt_params[0]);
-  size.y = parseInt(sizt_params[1]);
-  size.count = size.x * size.y;
-
-  const set_time = document.querySelector("#set_time");
-  time = set_time.value;
-
-  // 설정에 저장
-  settings.size = set_size.value;
-  settings.time = set_time.value;
+  toggleModal();
+  setting_apply();
 
   // Effect 재생
   effects["game_start"].play();
@@ -447,13 +437,41 @@ modal_replay.addEventListener("click", () => {
     effects["bgm"].play();
     effects["bgm"].loop = true;
   }, 2200);
+  
+  // 설정을 로컬 스토리지에 저장
+  localStorage.setItem("hananacard_game_settings", JSON.stringify(settings));
+});
+
+// 설정을 게임에 적용
+const setting_apply = () => {
+  const set_size = document.querySelector("#set_size"); // 2x2, 4x4, 6x6, 8x8
+  const sizt_params = set_size.value.split("x");
+  size.x = parseInt(sizt_params[0]);
+  size.y = parseInt(sizt_params[1]);
+  size.count = size.x * size.y;
+
+  const set_time = document.querySelector("#set_time");
+  time = set_time.value;
+
+  // 설정 저장
+  settings.size = set_size.value;
+  settings.time = set_time.value;
 
   setCards();
   startGame();
   displayTime();
   checkSuccess();
-  toggleModal();
-});
+};
+
+// hananacard_game_settings이 있는 경우 설정을 불러옴
+const gameSettings = JSON.parse(localStorage.getItem("hananacard_game_settings"));
+if (gameSettings) {
+  const set_size = document.querySelector("#set_size");
+  const set_time = document.querySelector("#set_time");
+  set_size.value = gameSettings.size;
+  set_time.value = gameSettings.time;
+  setting_apply();
+}
 
 /**
  * Volume Control
